@@ -1,0 +1,510 @@
+<a href="/static/#/settings/reportsdetails/60" class="btn btn-success">Редактировать</a>
+
+<div class="row mb-3">
+  <div class="col">
+    <h5 class="text-success fw-bold">Отчет по обращениям (напишите нам)</h5>
+  </div>
+</div>
+
+<div class="card shadow-sm">
+  <div class="card-body">
+    <form [formGroup]="form" (ngSubmit)="bind()" *ngIf="loaded && form">
+        
+        
+        <!-- Год -->
+        <div class="col-md-6 mb-2">
+            <label class="form-label" for="param$year" translate>Выберите год</label>
+            <input
+              type="number"
+              class="form-control"
+              formControlName="param$year"
+              [attr.max]="(today | date:'yyyy')"
+              min="2000"
+              placeholder="Введите год"
+            />
+            <div class="field-note" style="color: #666; font-size: 0.9rem; margin-top: 4px;">
+  <i class="fas fa-info-circle" style="margin-right: 5px; color: #007bff;"></i>
+  Если год не выбран, будет использоваться текущий год по умолчанию
+</div>
+
+        
+        </div>
+
+        
+        <div class="radio-inputs">
+          <label class="radio">
+            <input type="radio" name="radio" formControlName="periodTypeRadio" value="period" (change)="clearPeriodParams()">
+            <span class="name">Период</span>
+          </label>
+          <label class="radio">
+            <input type="radio" name="radio" formControlName="periodTypeRadio" value="quarter" (change)="clearPeriodParams()">
+            <span class="name">За квартал</span>
+          </label>
+          <label class="radio">
+            <input type="radio" name="radio" formControlName="periodTypeRadio" value="half_year" (change)="clearPeriodParams()">
+            <span class="name">Полугодие</span>
+          </label>
+        </div>
+        <!-- !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! -->
+        <div *ngIf="f.periodTypeRadio.value === 'period'" class="row">
+            <div class="col-md-4 mb-2 p-fluid p-grid p-formgrid">
+              <label translate for="param$79">Период создания с</label>
+            
+              <ng-container *ngIf="false; else date_editparam$79">
+                <input type="text" disabled pInputText *ngIf="f.param$79.value" [value]="f.param$79.value | date:'dd.MM.yyyy'" />
+                <input type="text" disabled pInputText *ngIf="!f.param$79.value" [value]="'Дата не выбрана' | translate" />
+              </ng-container>
+            
+              <ng-template #date_editparam$79>
+                <prime-date
+                  formControlName="param$79"
+                  [showTime]="false"
+                  [showSeconds]="false"
+                  [disabledDates]="[]"
+                ></prime-date>
+              </ng-template>
+            
+              <div *ngIf="f.param$79.errors?.isExternalError" class="invalid-feedback">
+                <span [translate]="f.param$79.errors?.isExternalErrorText"></span>
+              </div>
+            </div>
+    
+    
+            <div class="col-md-4 mb-2 p-fluid p-grid p-formgrid">
+              <label translate for="param$80">Период создания по</label>
+            
+              <ng-container *ngIf="false; else date_editparam$80">
+                <input type="text" disabled pInputText *ngIf="f.param$80.value" [value]="f.param$80.value | date:'dd.MM.yyyy'" />
+                <input type="text" disabled pInputText *ngIf="!f.param$80.value" [value]="'Дата не выбрана' | translate" />
+              </ng-container>
+            
+              <ng-template #date_editparam$80>
+                <prime-date
+                  formControlName="param$80"
+                  [showTime]="false"
+                  [showSeconds]="false"
+                  [disabledDates]="[]"
+                ></prime-date>
+              </ng-template>
+            
+              <div *ngIf="f.param$80.errors?.isExternalError" class="invalid-feedback">
+                <span [translate]="f.param$80.errors?.isExternalErrorText"></span>
+              </div>
+            </div>
+        </div>
+        
+        <div *ngIf="f.periodTypeRadio.value === 'quarter'" class="col-md-6 mb-2">
+          <label class="form-label" for="param$81" translate>За квартал</label>
+          <select class="form-select" formControlName="param$81" [(ngModel)]="quarterType">
+            <option [ngValue]="'1'">1 Квартал</option>
+            <option [ngValue]="'2'">2 Квартал</option>
+            <option [ngValue]="'3'">3 Квартал</option>
+            <option [ngValue]="'4'">4 Квартал</option>
+          </select>
+        </div>
+        
+        <div *ngIf="f.periodTypeRadio.value === 'half_year'" class="col-md-6 mb-2">
+          <label class="form-label" for="param$82" translate>Полугодие</label>
+          <select class="form-select" formControlName="param$82" [(ngModel)]="yearType">
+            <option [ngValue]="'1'">1 Полугодие</option>
+            <option [ngValue]="'2'">2 Полугодие</option>
+          </select>
+        </div>
+        <!-- !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! -->
+
+      <!-- Кнопки -->
+      <div class="d-flex gap-2 mt-3">
+        <button class="btn btn-success" type="submit">Сформировать</button>
+        <button class="btn btn-outline-success" type="button" (click)="export(104)">
+          <i class="fa fa-file-excel-o"></i> Excel
+        </button>
+        <button class="btn btn-outline-primary" type="button" (click)="export(103)">
+          <i class="fa fa-file-csv"></i> CSV
+        </button>
+      </div>
+    </form>
+
+    <!-- Таблица -->
+    <div class="table-responsive mt-4">
+      <table class="table table-bordered table-hover align-middle">
+        <thead class="table-light">
+          <tr>
+            <ng-container *ngFor="let field of fields['report$its_report_write_us']">
+              <th *ngIf="field.is_advanced !== 1" class="text-nowrap">
+                <div (click)="sortByField(field, 'report$its_report_write_us')" class="d-flex align-items-center cursor-pointer">
+                  <span [translate]="field.title"></span>
+                  <span class="material-icons ms-1" *ngIf="query_options['report$its_report_write_us'].orderBy === field.alias">
+                    {{ query_options['report$its_report_write_us'].orderAsc ? 'arrow_upward' : 'arrow_downward' }}
+                  </span>
+                </div>
+              </th>
+            </ng-container>
+          </tr>
+          <tr>
+            <ng-container *ngFor="let field of fields['report$its_report_write_us']">
+              <th *ngIf="field.is_advanced !== 1">
+                <ng-container *ngIf="field.show_filter === 1">
+                  <ng-container [ngSwitch]="field._data_type_code">
+
+                    <!-- Селект -->
+                    <div class="input-group" *ngSwitchCase="'reference'">
+                      <prime-select
+                        [(ngModel)]="field.value"
+                        [query-code]="field._def_sel_query_code"
+                        (selectItem)="query_options['report$its_report_write_us'].flteq[field.alias] = $event.id; bind();"
+                        (onClear)="query_options['report$its_report_write_us'].flteq[field.alias] = null; bind();"
+                      ></prime-select>
+                      <button *ngIf="field.value" class="btn btn-outline-danger" type="button"
+                        (click)="field.value = null; query_options['report$its_report_write_us'].flteq[field.alias] = null; bind();">
+                        ×
+                      </button>
+                    </div>
+
+                    <!-- Диапазон дат -->
+                    <ng-container *ngSwitchCase="'timestamp'" [ngTemplateOutlet]="date_range"></ng-container>
+                    <ng-container *ngSwitchCase="'date'" [ngTemplateOutlet]="date_range"></ng-container>
+                    <ng-container *ngSwitchCase="'current_datetime'" [ngTemplateOutlet]="date_range"></ng-container>
+                    <ng-container *ngSwitchCase="'current_and_on_update_datetime'" [ngTemplateOutlet]="date_range"></ng-container>
+
+                    <ng-template #date_range>
+                      <div class="input-group">
+                        <prime-date
+                          selectionMode="range"
+                          [readonlyInput]="true"
+                          [(ngModel)]="field.value"
+                          (ngModelChange)="query_options['report$its_report_write_us'].func22[field.alias] = $event.join('|'); bind();"
+                        ></prime-date>
+                        <button *ngIf="field.value" class="btn btn-outline-danger" type="button"
+                          (click)="field.value = null; query_options['report$its_report_write_us'].func22[field.alias] = null; bind();">
+                          ×
+                        </button>
+                      </div>
+                    </ng-template>
+
+                    <!-- Число -->
+                    <ng-container *ngSwitchCase="'double'" [ngTemplateOutlet]="number_input"></ng-container>
+                    <ng-container *ngSwitchCase="'serial'" [ngTemplateOutlet]="number_input"></ng-container>
+                    <ng-container *ngSwitchCase="'number'" [ngTemplateOutlet]="number_input"></ng-container>
+
+                    <ng-template #number_input>
+                      <input type="number" class="form-control"
+                        [(ngModel)]="field.value"
+                        (change)="query_options['report$its_report_write_us'].flteq[field.alias] = $event.target.value; bind();" />
+                    </ng-template>
+
+                    <!-- По умолчанию текст -->
+                    <div class="input-group" *ngSwitchDefault>
+                      <input type="text" class="form-control" [(ngModel)]="field.value"
+                        (change)="query_options['report$its_report_write_us'].flt[field.alias] = $event.target.value; bind();" />
+                      <button *ngIf="field.value" class="btn btn-outline-danger" type="button"
+                        (click)="field.value = ''; query_options['report$its_report_write_us'].flt[field.alias] = null; bind();">
+                        ×
+                      </button>
+                    </div>
+
+                  </ng-container>
+                </ng-container>
+              </th>
+            </ng-container>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let row of query_report$its_report_write_us">
+            <td *ngFor="let col of ['column_number_1', 'column_number_2', 'column_number_3', 'column_number_4',
+                                    'column_number_5', 'column_number_6', 'column_number_7', 'column_number_8',
+                                    'column_number_9', 'column_number_10', 'column_number_11', 'column_number_12',
+                                    'column_number_13', 'column_number_14', 'column_number_15', 'column_number_16',
+                                    'column_number_17', 'column_number_18', 'column_number_19']">
+              <div [innerHTML]="row[col]"></div>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+
+<style>
+.radio-inputs {
+  position: relative;
+  display: flex;
+  flex-wrap: wrap;
+  border-radius: 0.5rem;
+  background-color: #EEE;
+  box-sizing: border-box;
+  box-shadow: 0 0 0px 1px rgba(0, 0, 0, 0.06);
+  padding: 0.25rem;
+  width: 300px;
+  font-size: 14px;
+}
+
+.radio-inputs .radio {
+  flex: 1 1 auto;
+  text-align: center;
+}
+
+.radio-inputs .radio input {
+  display: none;
+}
+
+.radio-inputs .radio .name {
+  display: flex;
+  cursor: pointer;
+  align-items: center;
+  justify-content: center;
+  border-radius: 0.5rem;
+  border: none;
+  padding: .5rem 0;
+  color: rgba(51, 65, 85, 1);
+  transition: all .15s ease-in-out;
+}
+
+.radio-inputs .radio input:checked + .name {
+  background-color: #fff;
+  font-weight: 600;
+}
+body {
+  font-family: 'Segoe UI', sans-serif;
+  background: #f4f6f8;
+  color: #333;
+  margin: 0;
+  padding: 30px 40px;
+  line-height: 1.6;
+}
+
+b {
+  font-size: 1.3rem;
+  color: #27ae60;
+  font-weight: 700;
+}
+
+.card {
+  background: #fff;
+  border-radius: 16px;
+  box-shadow: 0 6px 15px rgba(0, 0, 0, 0.08);
+  padding: 30px 35px;
+  margin-top: 15px;
+  transition: box-shadow 0.3s ease;
+}
+.card:hover {
+  box-shadow: 0 10px 25px rgba(39, 174, 96, 0.25);
+}
+
+label {
+  font-weight: 600;
+  margin-bottom: 8px;
+  display: block;
+  color: #01634c;
+  font-size: 0.95rem;
+}
+
+input[type=text],
+input[type=number],
+select,
+.p-inputtext {
+  width: 100%;
+  padding: 10px 14px;
+  border: 1px solid #ccc;
+  border-radius: 7px;
+  font-size: 1rem;
+  transition: border-color 0.3s ease, box-shadow 0.3s ease;
+  box-sizing: border-box;
+}
+
+input[type=text]:focus,
+input[type=number]:focus,
+select:focus,
+.p-inputtext:focus {
+  border-color: #01634c;
+  box-shadow: 0 0 0 0 rgba(39, 174, 96, 0.3);
+}
+
+.invalid-feedback {
+  color: #e74c3c;
+  font-size: 0.875rem;
+  margin-top: 6px;
+  font-style: italic;
+}
+
+.btn {
+  padding: 10px 20px;
+  border: none;
+  color: #fff;
+  border-radius: 12px;
+  font-weight: 700;
+  font-size: 1rem;
+  cursor: pointer;
+  user-select: none;
+  transition: background-color 0.25s ease, box-shadow 0.25s ease;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.btn-primary {
+  background-color: #01634c;
+  color: #fff;
+  box-shadow: 0 3px 8px rgba(39, 174, 96, 0.4);
+}
+
+.btn-primary:hover,
+.btn-primary:focus {
+  background-color: #01634c;
+  box-shadow: 0 5px 15px rgba(33, 145, 80, 0.6);
+  outline: none;
+}
+
+.btn-success {
+  background-color: #01634c;
+  color: #fff;
+  box-shadow: 0 3px 8px rgba(46, 204, 113, 0.4);
+}
+.btn-success:hover,
+.btn-success:focus {
+  background-color: #27ae60;
+  box-shadow: 0 5px 15px rgba(39, 174, 96, 0.6);
+  outline: none;
+}
+
+.btn-outline-success {
+  background: transparent;
+  color: #27ae60;
+  border: 2px solid #27ae60;
+  box-shadow: none;
+  font-weight: 600;
+}
+
+.btn-outline-success:hover,
+.btn-outline-success:focus {
+  background-color: #27ae60;
+  color: white;
+  box-shadow: 0 5px 15px rgba(39, 174, 96, 0.4);
+  outline: none;
+}
+
+.btn-outline-primary {
+  background: transparent;
+  color: #2980b9;
+  border: 2px solid #2980b9;
+  font-weight: 600;
+  box-shadow: none;
+}
+
+.btn-outline-primary:hover,
+.btn-outline-primary:focus {
+  background-color: #2980b9;
+  color: white;
+  box-shadow: 0 5px 15px rgba(41, 128, 185, 0.4);
+  outline: none;
+}
+
+.table {
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 0 6px;
+  margin-top: 25px;
+  font-size: 0.95rem;
+}
+
+.table thead {
+  background: linear-gradient(135deg, #01634c 0%, #27ae60 100%);
+  color: white;
+  font-weight: 700;
+  font-size: 1rem;
+  border-radius: 12px;
+  box-shadow: 0 2px 6px rgba(39, 174, 96, 0.3);
+}
+
+.table th,
+.table td {
+  padding: 14px 16px;
+  text-align: center;
+  vertical-align: middle;
+  background-color: linear-gradient(135deg, #027a5a 0%, #2ecc71 100%);
+  border: none;
+}
+
+.table tbody tr {
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+  border-radius: 10px;
+  transition: background-color 0.3s ease;
+  cursor: default;
+  display: table-row;
+}
+
+.table tbody tr:nth-child(even) {
+  background-color: #f9f9f9;
+}
+
+.table tbody tr:hover {
+  background-color: #e8f5e9;
+}
+
+.cursor-pointer {
+  cursor: pointer;
+}
+
+.d-flex {
+  display: flex;
+  align-items: center;
+}
+
+.gap-2 {
+  gap: 12px;
+}
+
+.mb-3 {
+  margin-bottom: 1.25rem;
+}
+
+.mt-3 {
+  margin-top: 1.25rem;
+}
+
+.text-success {
+  color: #27ae60 !important;
+}
+
+.text-nowrap {
+  white-space: nowrap;
+}
+
+
+/* Форма и поля улучшения */
+.row > .col-md-4 {
+  padding-left: 12px;
+  padding-right: 12px;
+}
+
+/* Иконки в кнопках */
+.btn i.fa {
+  font-size: 1.15rem;
+  pointer-events: none;
+}
+
+/* Обертка таблицы для плавного скролла */
+.table-responsive {
+  overflow-x: auto;
+  padding-bottom: 5px;
+}
+
+.field-note {
+  font-size: 0.85rem;
+  color: #555;
+  margin-top: 6px;
+  max-width: 320px;
+  line-height: 1.4;
+  font-style: italic;
+  background-color: #f9f9f9;
+  border-left: 3px solid #27ae60;
+  padding: 8px 12px;
+  border-radius: 4px;
+  user-select: none;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+}
+
+.col-md-4.mb-3 {
+  margin-bottom: 0 !important;
+}
+</style>

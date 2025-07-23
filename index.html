@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Excel Viewer</title>
+  <script src="https://cdn.sheetjs.com/xlsx-0.20.0/package/dist/xlsx.full.min.js"></script>
+  <style>
+    #output { display: flex; gap: 20px; margin-top: 20px; }
+    pre { background: #f4f4f4; padding: 10px; max-height: 500px; overflow: auto; }
+    table, th, td { border: 1px solid #ccc; border-collapse: collapse; padding: 5px; }
+  </style>
+</head>
+<body>
+
+<h2>📁 Загрузите Excel-файл</h2>
+<input type="file" id="upload" accept=".xlsx,.xls" />
+<div id="output">
+  <div>
+    <h3>📋 Таблица</h3>
+    <div id="tableContainer"></div>
+  </div>
+  <div>
+    <h3>🧾 JSON</h3>
+    <pre id="jsonContainer"></pre>
+  </div>
+</div>
+
+<script>
+  document.getElementById('upload').addEventListener('change', function(e) {
+    const file = e.target.files[0];
+    if (!file) return;
+
+    const reader = new FileReader();
+    reader.onload = function(e) {
+      const data = new Uint8Array(e.target.result);
+      const workbook = XLSX.read(data, { type: 'array' });
+      const sheetName = workbook.SheetNames[0];
+      const worksheet = workbook.Sheets[sheetName];
+
+      const jsonData = XLSX.utils.sheet_to_json(worksheet, { defval: "" });
+      const tableHTML = XLSX.utils.sheet_to_html(worksheet);
+
+      document.getElementById('tableContainer').innerHTML = tableHTML;
+      document.getElementById('jsonContainer').textContent = JSON.stringify(jsonData, null, 2);
+    };
+
+    reader.readAsArrayBuffer(file);
+  });
+</script>
+
+</body>
+</html>
